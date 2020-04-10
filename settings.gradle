@@ -1,0 +1,2 @@
+rootProject.name='TimeFlighter'
+include ':app'
