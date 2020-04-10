@@ -43,7 +43,14 @@ class MainActivity : AppCompatActivity() {
             incrementScore()
         }
 
-        resetGame()
+        if (savedInstanceState != null) {
+            score = savedInstanceState.getInt(SCORE_KEY)
+            timeLeftOnTimer = savedInstanceState.getLong(TIME_LEFT_KEY)
+            restoreGame()
+        } else {
+            resetGame()
+        }
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -84,6 +91,28 @@ class MainActivity : AppCompatActivity() {
         gameStarted = false
     }
 
+    private fun restoreGame() {
+        gameScoreTextView.text = getString(R.string.tv_score_text, score)
+
+        val restoredTime = timeLeftOnTimer / 1000
+        timerTextView.text = getString(R.string.tv_timer_text, restoredTime)
+
+        countDownTimer = object : CountDownTimer(timeLeftOnTimer, countDownInterval) {
+            override fun onTick(millisUntilFinished: Long) {
+                timeLeftOnTimer = millisUntilFinished
+                val timeLeft = millisUntilFinished / 1000
+                timerTextView.text = getString(R.string.tv_timer_text, timeLeft)
+            }
+
+            override fun onFinish() {
+                endGame()
+            }
+        }
+
+        countDownTimer.start()
+        gameStarted = true
+    }
+
     private fun incrementScore() {
         if (!gameStarted) {
             startGame()
@@ -91,7 +120,7 @@ class MainActivity : AppCompatActivity() {
 
         score += 1
         val newScore = getString(R.string.tv_score_text, score)
-        gameScoreTextView.text = newScore;
+        gameScoreTextView.text = newScore
     }
 
     private fun startGame() {
